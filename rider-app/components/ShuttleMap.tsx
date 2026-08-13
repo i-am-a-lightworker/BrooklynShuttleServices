@@ -51,9 +51,11 @@ async function fetchRouteGeometry(token: string): Promise<[number, number][] | n
   try {
     const res = await fetch(url);
     const data = await res.json();
-    // Logged so the raw response shape can be checked against real streets
-    // (should trace Utica Ave / Atlantic Ave, not a diagonal shortcut).
-    console.log("Mapbox Directions API response:", data);
+    if (process.env.NODE_ENV !== "production") {
+      // Logged so the raw response shape can be checked against real streets
+      // (should trace Utica Ave / Atlantic Ave, not a diagonal shortcut).
+      console.log("Mapbox Directions API response:", data);
+    }
     const coords = data?.routes?.[0]?.geometry?.coordinates;
     if (!Array.isArray(coords) || coords.length < 2) return null;
     return coords as [number, number][];
@@ -130,7 +132,8 @@ function makeHubMarkerEl(): { el: HTMLDivElement; ring: HTMLDivElement } {
 }
 
 type ShuttleMapProps = {
-  hoveredSegment?: "a" | "b" | null;
+  // "both" covers the hub leg, which sits at the junction of both segments.
+  hoveredSegment?: "a" | "b" | "both" | null;
 };
 
 export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
@@ -139,7 +142,9 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
   const markersRef = useRef<Record<string, mapboxgl.Marker>>({});
   const hubRingRef = useRef<HTMLDivElement | null>(null);
   const simIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const hoveredSegmentRef = useRef<"a" | "b" | null>(hoveredSegment);
+  const hoveredSegmentRef = useRef<"a" | "b" | "both" | null>(hoveredSegment);
+  const isLiveRef = useRef(false);
+  const isMountedRef = useRef(true);
   const [isLive, setIsLive] = useState(false);
 
   function setSegmentHighlight(map: mapboxgl.Map) {
@@ -151,15 +156,16 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
       return;
     }
 
+    const current = hoveredSegmentRef.current;
     map.setPaintProperty(
       "corridor-a-line",
       "line-width",
-      hoveredSegmentRef.current === "a" ? 5 : 3
+      current === "a" || current === "both" ? 5 : 3
     );
     map.setPaintProperty(
       "corridor-b-line",
       "line-width",
-      hoveredSegmentRef.current === "b" ? 5 : 3
+      current === "b" || current === "both" ? 5 : 3
     );
   }
 
@@ -219,15 +225,20 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
     }, 100);
   }
 
-  function stopSimulation() {
+  // keepShuttleId leaves that shuttle's simulated marker in place (frozen,
+  // since the interval is always fully stopped) instead of removing it —
+  // used when only one shuttle has gone live, so the other doesn't vanish
+  // from the map until it reports too.
+  function stopSimulation(keepShuttleId?: string) {
     if (simIntervalRef.current) {
       clearInterval(simIntervalRef.current);
       simIntervalRef.current = null;
     }
-    markersRef.current["shuttle-1"]?.remove();
-    markersRef.current["shuttle-2"]?.remove();
-    delete markersRef.current["shuttle-1"];
-    delete markersRef.current["shuttle-2"];
+    for (const id of ["shuttle-1", "shuttle-2"]) {
+      if (id === keepShuttleId) continue;
+      markersRef.current[id]?.remove();
+      delete markersRef.current[id];
+    }
     if (hubRingRef.current) hubRingRef.current.style.display = "none";
   }
 
@@ -245,7 +256,17 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
     mapRef.current = map;
 
     map.on("load", async () => {
-      const realGeometry = await fetchRouteGeometry(token);
+      // Independent requests — fetch route geometry and any existing
+      // shuttle positions in parallel rather than one after the other.
+      const [realGeometry, positionsResult] = await Promise.all([
+        fetchRouteGeometry(token),
+        supabase
+          .from("shuttle_positions")
+          .select("shuttle_id, lat, lng, updated_at")
+          .order("updated_at", { ascending: false }),
+      ]);
+      if (!isMountedRef.current) return;
+
       const { segA, segB } = realGeometry
         ? splitAtHub(realGeometry)
         : { segA: FALLBACK_SEGMENT_A, segB: FALLBACK_SEGMENT_B };
@@ -276,17 +297,16 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
       hubRingRef.current = ring;
       new mapboxgl.Marker(hubEl).setLngLat(HUB).addTo(map);
 
-      // Load whatever's already in shuttle_positions. If nothing's there
-      // yet, fall back to the simulated shuttles until a real row arrives
-      // over the Realtime subscription below.
-      const { data, error } = await supabase
-        .from("shuttle_positions")
-        .select("shuttle_id, lat, lng, updated_at")
-        .order("updated_at", { ascending: false });
-
+      // Whatever's already in shuttle_positions. If nothing's there yet,
+      // fall back to the simulated shuttles until a real row arrives over
+      // the Realtime subscription below — unless a live row already
+      // arrived via that subscription while this fetch was in flight, in
+      // which case starting the simulation now would hijack the real
+      // marker's position on every tick.
+      const { data, error } = positionsResult;
       const rows = (data as ShuttlePosition[] | null) ?? [];
       if (error || rows.length === 0) {
-        startSimulation(map, segA, segB);
+        if (!isLiveRef.current) startSimulation(map, segA, segB);
         return;
       }
       const latestByShuttle = new Map<string, ShuttlePosition>();
@@ -296,6 +316,7 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
       latestByShuttle.forEach((pos) => {
         upsertRealMarker(map, pos, pos.shuttle_id === "shuttle-2" ? BRAND.navy : BRAND.burgundy);
       });
+      isLiveRef.current = true;
       setIsLive(true);
     });
 
@@ -309,15 +330,20 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
         { event: "*", schema: "public", table: "shuttle_positions" },
         (payload) => {
           const pos = payload.new as ShuttlePosition;
-          if (!pos || !mapRef.current) return;
-          if (simIntervalRef.current) stopSimulation();
+          // DELETE events carry an empty (but truthy) `new: {}` — check for
+          // an actual shuttle_id, not just object presence, so a delete
+          // doesn't create a marker with undefined coordinates.
+          if (!pos?.shuttle_id || !mapRef.current) return;
+          if (simIntervalRef.current) stopSimulation(pos.shuttle_id);
           upsertRealMarker(mapRef.current, pos, pos.shuttle_id === "shuttle-2" ? BRAND.navy : BRAND.burgundy);
+          isLiveRef.current = true;
           setIsLive(true);
         }
       )
       .subscribe();
 
     return () => {
+      isMountedRef.current = false;
       stopSimulation();
       supabase.removeChannel(channel);
       map.remove();

@@ -5,13 +5,15 @@ import ShuttleMap from "@/components/ShuttleMap";
 import { ROUTE } from "@/lib/product-config";
 
 export default function RouteAndMap() {
-  const [hoveredSegment, setHoveredSegment] = useState<"a" | "b" | null>(null);
+  const [hoveredSegment, setHoveredSegment] = useState<"a" | "b" | "both" | null>(null);
 
   return (
     <>
       <section className="mt-16 grid gap-4 sm:grid-cols-3">
         {ROUTE.shuttles.map((leg) => {
-          const segment = leg.id === "shuttle-2" ? "b" : "a";
+          // The hub sits at the junction of both segments, not specifically
+          // on the Canarsie side — hovering it highlights both.
+          const segment = leg.id === "shuttle-2" ? "b" : leg.id === "hub" ? "both" : "a";
 
           return (
             <div

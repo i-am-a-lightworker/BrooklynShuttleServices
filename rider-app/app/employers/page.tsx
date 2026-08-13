@@ -108,9 +108,8 @@ export default function EmployersPage() {
 
               setSubmitting(false);
               if (insertError) {
-                setError(
-                  "Couldn't submit — " + insertError.message + ". Try again in a moment."
-                );
+                console.error("employer_leads insert failed:", insertError.message);
+                setError("Couldn't submit — try again in a moment.");
                 return;
               }
               setSubmitted(true);
