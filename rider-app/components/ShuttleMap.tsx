@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { lineString, point, along, length, distance, nearestPointOnLine } from "@turf/turf";
 import { supabase } from "@/lib/supabase";
+import { BRAND } from "@/lib/brand";
 
 // Confirmed real coordinates (Google Places), [lng, lat] for GeoJSON/turf.
 const CANARSIE: [number, number] = [-73.8978183, 40.6411714];
@@ -26,9 +27,6 @@ const DIRECTIONS_WAYPOINTS: [number, number][] = [
 const FALLBACK_SEGMENT_A: [number, number][] = [CANARSIE, EASTERN_PKWY_UTICA, HUB];
 const FALLBACK_SEGMENT_B: [number, number][] = [HUB, COURT_ST];
 
-const BURGUNDY = "#5E0000";
-const NAVY = "#0D1028";
-const GOLD = "#B08D57";
 
 const HUB_PROXIMITY_KM = 0.06; // ~60m — both shuttles inside this = "connecting"
 const SHUTTLE_1_PERIOD_MS = 14000; // Canarsie <-> hub, one-way
@@ -114,7 +112,8 @@ function makeHubMarkerEl(): { el: HTMLDivElement; ring: HTMLDivElement } {
   ring.style.position = "absolute";
   ring.style.inset = "0";
   ring.style.borderRadius = "50%";
-  ring.style.background = GOLD;
+  ring.style.background = "transparent";
+  ring.style.border = `2px solid ${BRAND.gold}`;
   ring.style.opacity = "0.6";
   ring.style.display = "none";
 
@@ -122,8 +121,8 @@ function makeHubMarkerEl(): { el: HTMLDivElement; ring: HTMLDivElement } {
   dot.style.position = "absolute";
   dot.style.inset = "0";
   dot.style.borderRadius = "50%";
-  dot.style.background = GOLD;
-  dot.style.border = `2px solid ${NAVY}`;
+  dot.style.background = BRAND.navy;
+  dot.style.border = `2px solid ${BRAND.gold}`;
 
   el.appendChild(ring);
   el.appendChild(dot);
@@ -161,10 +160,10 @@ export default function ShuttleMap() {
 
     markersRef.current["shuttle-1"] =
       markersRef.current["shuttle-1"] ??
-      new mapboxgl.Marker(makeShuttleMarkerEl(BURGUNDY)).setLngLat(CANARSIE).addTo(map);
+      new mapboxgl.Marker(makeShuttleMarkerEl(BRAND.burgundy)).setLngLat(CANARSIE).addTo(map);
     markersRef.current["shuttle-2"] =
       markersRef.current["shuttle-2"] ??
-      new mapboxgl.Marker(makeShuttleMarkerEl(NAVY)).setLngLat(HUB).addTo(map);
+      new mapboxgl.Marker(makeShuttleMarkerEl(BRAND.navy)).setLngLat(HUB).addTo(map);
 
     const startTime = performance.now();
     simIntervalRef.current = setInterval(() => {
@@ -231,13 +230,13 @@ export default function ShuttleMap() {
         id: "corridor-a-line",
         type: "line",
         source: "corridor-a",
-        paint: { "line-color": BURGUNDY, "line-width": 3 },
+        paint: { "line-color": BRAND.burgundy, "line-width": 3 },
       });
       map.addLayer({
         id: "corridor-b-line",
         type: "line",
         source: "corridor-b",
-        paint: { "line-color": NAVY, "line-width": 3 },
+        paint: { "line-color": BRAND.navy, "line-width": 3 },
       });
 
       const { el: hubEl, ring } = makeHubMarkerEl();
@@ -262,7 +261,7 @@ export default function ShuttleMap() {
         if (!latestByShuttle.has(row.shuttle_id)) latestByShuttle.set(row.shuttle_id, row);
       }
       latestByShuttle.forEach((pos) => {
-        upsertRealMarker(map, pos, pos.shuttle_id === "shuttle-2" ? NAVY : BURGUNDY);
+        upsertRealMarker(map, pos, pos.shuttle_id === "shuttle-2" ? BRAND.navy : BRAND.burgundy);
       });
       setIsLive(true);
     });
@@ -279,7 +278,7 @@ export default function ShuttleMap() {
           const pos = payload.new as ShuttlePosition;
           if (!pos || !mapRef.current) return;
           if (simIntervalRef.current) stopSimulation();
-          upsertRealMarker(mapRef.current, pos, pos.shuttle_id === "shuttle-2" ? NAVY : BURGUNDY);
+          upsertRealMarker(mapRef.current, pos, pos.shuttle_id === "shuttle-2" ? BRAND.navy : BRAND.burgundy);
           setIsLive(true);
         }
       )

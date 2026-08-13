@@ -16,14 +16,10 @@ import {
   pmOverAmPct,
   type WaypointEvidence,
 } from "@/lib/evidence-data";
+import { BRAND, EVIDENCE_TIER_COLOR } from "@/lib/brand";
 import EvidenceBadge from "./EvidenceBadge";
 
-const TIER_COLOR: Record<WaypointEvidence["tier"], string> = {
-  concurrent: "#16a34a", // green
-  bridge: "#d97706", // amber
-  directional: "#6b7280", // gray
-  anomaly: "#e11d48", // rose
-};
+const TIER_COLOR: Record<WaypointEvidence["tier"], string> = EVIDENCE_TIER_COLOR;
 
 function shortLabel(label: string): string {
   return label.length > 16 ? label.slice(0, 15) + "…" : label;
@@ -59,11 +55,11 @@ export default function EvidenceChart() {
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 16, left: -16, bottom: 24 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5DFD3" />
+            <CartesianGrid strokeDasharray="3 3" stroke={BRAND.beige} />
             <XAxis
               dataKey="name"
               tick={{ fontSize: 10, fill: "#0D1028aa" }}
-              axisLine={{ stroke: "#E5DFD3" }}
+              axisLine={{ stroke: BRAND.beige }}
               tickLine={false}
               angle={-20}
               textAnchor="end"
@@ -71,7 +67,7 @@ export default function EvidenceChart() {
             />
             <YAxis
               tick={{ fontSize: 11, fill: "#0D1028aa" }}
-              axisLine={{ stroke: "#E5DFD3" }}
+              axisLine={{ stroke: BRAND.beige }}
               tickLine={false}
               width={48}
             />

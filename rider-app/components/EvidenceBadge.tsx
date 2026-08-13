@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { WaypointEvidence } from "@/lib/evidence-data";
 import { pmOverAmPct } from "@/lib/evidence-data";
 
+// These Tailwind classes intentionally match EVIDENCE_TIER_COLOR in lib/brand.ts; update both together.
 const TIER_STYLES: Record<
   WaypointEvidence["tier"],
   { bg: string; text: string; label: string }

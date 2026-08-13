@@ -28,6 +28,9 @@ const config: Config = {
         display: ["var(--font-display)", "serif"],
         sans: ["var(--font-sans)", "sans-serif"],
       },
+      fontSize: {
+        '2xs': ['10px', { lineHeight: '14px' }],
+      },
     },
   },
   plugins: [],

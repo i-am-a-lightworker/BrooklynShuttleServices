@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 body {
-  background-color: #F6F3EE; /* cream */
-  color: #24221F; /* charcoal */
+  @apply bg-cream;
+  @apply text-charcoal;
 }
 
 /* Brand rule: no pure #000000/#FFFFFF anywhere, gridlines/borders use beige
    rather than harsh black/grey */
 hr, .divider {
-  border-color: #D9D3CB;
+  @apply border-beige;
 }
 
 .sr-only {
