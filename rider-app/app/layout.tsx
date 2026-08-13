@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import SiteNav from "@/components/SiteNav";
 import { BRAND_NAME } from "@/lib/product-config";
 import "./globals.css";
 
@@ -38,20 +39,7 @@ export default function RootLayout({
             >
               {BRAND_NAME}
             </a>
-            <div className="flex gap-8 text-[11px] font-semibold uppercase tracking-wide text-charcoal">
-              <a href="/pricing" className="hover:text-burgundy">
-                Fares
-              </a>
-              <a href="/events" className="hover:text-burgundy">
-                Barclays events
-              </a>
-              <a href="/employers" className="hover:text-burgundy">
-                For employers
-              </a>
-              <a href="/careers" className="hover:text-burgundy">
-                Careers
-              </a>
-            </div>
+            <SiteNav />
           </nav>
         </header>
         <main>{children}</main>
