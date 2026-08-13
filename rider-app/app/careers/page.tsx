@@ -1,4 +1,5 @@
 import { WORKFORCE_ROLES } from "@/lib/product-config";
+import WorkforceRoleCard from "@/components/WorkforceRoleCard";
 
 export default function CareersPage() {
   return (
@@ -15,17 +16,7 @@ export default function CareersPage() {
 
       <section className="mt-12 grid gap-4 sm:grid-cols-2">
         {WORKFORCE_ROLES.map((role) => (
-          <div
-            key={role.id}
-            className="rounded-sm border border-beige bg-cream p-5"
-          >
-            <h2 className="font-display text-lg font-semibold text-navy">
-              {role.label}
-            </h2>
-            {role.note && (
-              <p className="mt-1 text-sm text-charcoal/70">{role.note}</p>
-            )}
-          </div>
+          <WorkforceRoleCard key={role.id} role={role} />
         ))}
       </section>
 
