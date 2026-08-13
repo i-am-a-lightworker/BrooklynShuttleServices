@@ -1,6 +1,6 @@
 import { ROUTE, FARES, BENCHMARKS, BRAND_NAME } from "@/lib/product-config";
 import ShuttleMap from "@/components/ShuttleMap";
-import DemandChart from "@/components/DemandChart";
+import EvidenceChart from "@/components/EvidenceChart";
 
 export default function HomePage() {
   return (
@@ -71,11 +71,22 @@ export default function HomePage() {
         </h2>
         <p className="mt-2 max-w-2xl text-charcoal/70">
           Shuttles run more frequently through the PM plateau — the fare
-          stays the same, the wait gets shorter.
+          stays the same, the wait gets shorter. Every bar below is a real
+          count, color-coded by how directly comparable it is to the
+          others — click a waypoint to see the raw numbers.
         </p>
         <div className="mt-6">
-          <DemandChart />
+          <EvidenceChart />
         </div>
+        <p className="mt-6 max-w-2xl text-xs text-charcoal/50">
+          Built on NYC DOT Automated Traffic Volume Counts — a rotating
+          survey, not continuous monitoring. Each point above is labeled by
+          how directly comparable it is to the others.{" "}
+          <a href="#methodology" className="underline hover:text-burgundy">
+            Read the methodology note
+          </a>
+          .
+        </p>
       </section>
 
       <section className="mt-16 flex flex-wrap items-baseline gap-10 border-t border-beige pt-8 text-sm text-charcoal/60">
@@ -97,6 +108,27 @@ export default function HomePage() {
           </span>{" "}
           dollar van
         </div>
+      </section>
+
+      <section
+        id="methodology"
+        className="mt-16 scroll-mt-8 border-t border-beige pt-8 text-xs text-charcoal/60"
+      >
+        <h2 className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
+          Methodology note
+        </h2>
+        <p className="mt-2 max-w-2xl">
+          Built on NYC DOT Automated Traffic Volume Counts — a rotating
+          survey, not continuous monitoring. Segments get counted for a
+          window, then the survey moves on, so no two waypoints above were
+          necessarily measured at the same time. That&apos;s why every point
+          is tagged by evidence tier: concurrent points came from the same
+          field study, bridge points are a different study but corridor-
+          adjacent, directional points are different years and are used for
+          direction/shape rather than exact magnitude, and the one anomaly
+          point is shown because it doesn&apos;t fit the pattern — not
+          because it does.
+        </p>
       </section>
     </div>
   );
