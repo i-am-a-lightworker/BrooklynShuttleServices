@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #F6F3EE; /* cream */
+  color: #24221F; /* charcoal */
+}
+
+/* Brand rule: no pure #000000/#FFFFFF anywhere, gridlines/borders use beige
+   rather than harsh black/grey */
+hr, .divider {
+  border-color: #D9D3CB;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
