@@ -58,7 +58,7 @@ export default function EvidenceChart() {
             <CartesianGrid strokeDasharray="3 3" stroke={BRAND.beige} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 10, fill: "#0D1028aa" }}
+              tick={{ fontSize: 10, fill: `${BRAND.navy}aa` }}
               axisLine={{ stroke: BRAND.beige }}
               tickLine={false}
               angle={-20}
@@ -66,7 +66,7 @@ export default function EvidenceChart() {
               height={50}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: "#0D1028aa" }}
+              tick={{ fontSize: 11, fill: `${BRAND.navy}aa` }}
               axisLine={{ stroke: BRAND.beige }}
               tickLine={false}
               width={48}
