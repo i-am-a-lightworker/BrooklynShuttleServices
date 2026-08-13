@@ -1,5 +1,5 @@
-import { ROUTE, FARES, BENCHMARKS, BRAND_NAME } from "@/lib/product-config";
-import ShuttleMap from "@/components/ShuttleMap";
+import { FARES, BENCHMARKS, BRAND_NAME } from "@/lib/product-config";
+import RouteAndMap from "@/components/RouteAndMap";
 import EvidenceChart from "@/components/EvidenceChart";
 
 export default function HomePage() {
@@ -32,38 +32,7 @@ export default function HomePage() {
         </a>
       </div>
 
-      <section className="mt-16 grid gap-4 sm:grid-cols-3">
-        {ROUTE.shuttles.map((leg) => (
-          <div
-            key={leg.id}
-            className={`rounded-sm border p-5 ${
-              leg.id === "hub"
-                ? "border-gold/60 bg-cream"
-                : "border-beige bg-cream"
-            }`}
-          >
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              {leg.evidenceTier === "concurrent" && "Same-study evidence"}
-              {leg.evidenceTier === "bridge" && "Bridging evidence"}
-              {leg.evidenceTier === "directional" && "Directional evidence"}
-            </p>
-            <h2 className="mt-1 font-display text-xl font-semibold text-navy">
-              {leg.label}
-            </h2>
-            <p className="text-sm text-charcoal/70">
-              {leg.from} → {leg.to}
-            </p>
-            <p className="mt-2 text-xs text-charcoal/50">{leg.note}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="mt-16">
-        <h2 className="mb-3 font-display text-2xl font-semibold text-navy">
-          Live tracking
-        </h2>
-        <ShuttleMap />
-      </section>
+      <RouteAndMap />
 
       <section className="mt-16 rounded-sm border-l-2 border-burgundy bg-cream p-6 pl-8">
         <h2 className="font-display text-2xl font-semibold text-navy">

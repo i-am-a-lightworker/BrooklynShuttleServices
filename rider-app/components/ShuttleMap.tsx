@@ -129,13 +129,45 @@ function makeHubMarkerEl(): { el: HTMLDivElement; ring: HTMLDivElement } {
   return { el, ring };
 }
 
-export default function ShuttleMap() {
+type ShuttleMapProps = {
+  hoveredSegment?: "a" | "b" | null;
+};
+
+export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<Record<string, mapboxgl.Marker>>({});
   const hubRingRef = useRef<HTMLDivElement | null>(null);
   const simIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hoveredSegmentRef = useRef<"a" | "b" | null>(hoveredSegment);
   const [isLive, setIsLive] = useState(false);
+
+  function setSegmentHighlight(map: mapboxgl.Map) {
+    if (
+      !map.isStyleLoaded() ||
+      !map.getLayer("corridor-a-line") ||
+      !map.getLayer("corridor-b-line")
+    ) {
+      return;
+    }
+
+    map.setPaintProperty(
+      "corridor-a-line",
+      "line-width",
+      hoveredSegmentRef.current === "a" ? 5 : 3
+    );
+    map.setPaintProperty(
+      "corridor-b-line",
+      "line-width",
+      hoveredSegmentRef.current === "b" ? 5 : 3
+    );
+  }
+
+  useEffect(() => {
+    hoveredSegmentRef.current = hoveredSegment;
+    const map = mapRef.current;
+    if (map) setSegmentHighlight(map);
+  }, [hoveredSegment]);
 
   function upsertRealMarker(map: mapboxgl.Map, pos: ShuttlePosition, color: string) {
     const existing = markersRef.current[pos.shuttle_id];
@@ -238,6 +270,7 @@ export default function ShuttleMap() {
         source: "corridor-b",
         paint: { "line-color": BRAND.navy, "line-width": 3 },
       });
+      setSegmentHighlight(map);
 
       const { el: hubEl, ring } = makeHubMarkerEl();
       hubRingRef.current = ring;
