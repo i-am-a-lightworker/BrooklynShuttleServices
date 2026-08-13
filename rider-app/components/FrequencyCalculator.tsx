@@ -12,13 +12,17 @@ function formatHour(hour: number): string {
 
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => i);
 
-export default function FrequencyCalculator() {
+export default function FrequencyCalculator({ flash = false }: { flash?: boolean }) {
   const [hour, setHour] = useState(8);
   const band = bandForHour(hour);
   const wait = expectedWaitMinutes(hour);
 
   return (
-    <div className="rounded-sm border border-beige bg-cream p-6">
+    <div
+      className={`rounded-sm border border-beige bg-cream p-6 transition-shadow duration-500 ${
+        flash ? "ring-2 ring-gold" : ""
+      }`}
+    >
       <h2 className="font-display text-xl font-semibold text-navy">
         What time are you riding?
       </h2>

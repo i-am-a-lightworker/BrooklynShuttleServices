@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { FARES } from "@/lib/product-config";
 import FrequencyCalculator from "@/components/FrequencyCalculator";
 
@@ -32,6 +33,22 @@ async function startCheckout(fareKey: string) {
 }
 
 export default function PricingPage() {
+  const [flashCalculator, setFlashCalculator] = useState(false);
+
+  useEffect(() => {
+    if (!flashCalculator) return;
+
+    const timeout = window.setTimeout(() => setFlashCalculator(false), 1500);
+    return () => window.clearTimeout(timeout);
+  }, [flashCalculator]);
+
+  function jumpToFrequencyCalculator() {
+    setFlashCalculator(true);
+    document
+      .getElementById("frequency-calculator")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
       <h1 className="font-display text-4xl font-semibold text-navy">Fares</h1>
@@ -61,12 +78,19 @@ export default function PricingPage() {
             >
               Buy — test mode
             </button>
+            <button
+              type="button"
+              onClick={jumpToFrequencyCalculator}
+              className="mt-3 text-left text-xs text-charcoal/50 underline hover:text-burgundy"
+            >
+              See it in action ↓
+            </button>
           </div>
         ))}
       </div>
 
-      <div className="mt-16">
-        <FrequencyCalculator />
+      <div id="frequency-calculator" className="mt-16 scroll-mt-8">
+        <FrequencyCalculator flash={flashCalculator} />
       </div>
     </div>
   );
