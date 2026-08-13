@@ -48,6 +48,9 @@ export default function RootLayout({
               <a href="/employers" className="hover:text-burgundy">
                 For employers
               </a>
+              <a href="/careers" className="hover:text-burgundy">
+                Careers
+              </a>
             </div>
           </nav>
         </header>

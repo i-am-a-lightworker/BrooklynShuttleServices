@@ -1,5 +1,6 @@
-import { ROUTE, FARES, BENCHMARKS, DEMAND_PROFILE, BRAND_NAME } from "@/lib/product-config";
+import { ROUTE, FARES, BENCHMARKS, BRAND_NAME } from "@/lib/product-config";
 import ShuttleMap from "@/components/ShuttleMap";
+import DemandChart from "@/components/DemandChart";
 
 export default function HomePage() {
   return (
@@ -64,17 +65,17 @@ export default function HomePage() {
         <ShuttleMap />
       </section>
 
-      <section className="mt-16 rounded-sm border-l-2 border-burgundy bg-cream py-6 pl-8">
+      <section className="mt-16 rounded-sm border-l-2 border-burgundy bg-cream p-6 pl-8">
         <h2 className="font-display text-2xl font-semibold text-navy">
           Why the schedule leans PM
         </h2>
         <p className="mt-2 max-w-2xl text-charcoal/70">
-          PM rush ({DEMAND_PROFILE.pmRushWindow}) runs{" "}
-          {DEMAND_PROFILE.pmOverAmRange} at every waypoint we measured.
-          Shuttles run more frequently through the{" "}
-          {DEMAND_PROFILE.peakPlateauWindow} plateau — the fare stays the
-          same, the wait gets shorter.
+          Shuttles run more frequently through the PM plateau — the fare
+          stays the same, the wait gets shorter.
         </p>
+        <div className="mt-6">
+          <DemandChart />
+        </div>
       </section>
 
       <section className="mt-16 flex flex-wrap items-baseline gap-10 border-t border-beige pt-8 text-sm text-charcoal/60">

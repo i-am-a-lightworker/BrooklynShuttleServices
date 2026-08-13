@@ -1,6 +1,7 @@
 "use client";
 
 import { FARES } from "@/lib/product-config";
+import FrequencyCalculator from "@/components/FrequencyCalculator";
 
 const TIERS = [
   {
@@ -62,6 +63,10 @@ export default function PricingPage() {
             </button>
           </div>
         ))}
+      </div>
+
+      <div className="mt-16">
+        <FrequencyCalculator />
       </div>
     </div>
   );
