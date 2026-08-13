@@ -76,13 +76,7 @@ export default function EvidenceChart() {
               width={48}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend
-              wrapperStyle={{ fontSize: 12 }}
-              payload={[
-                { value: "AM (lighter)", type: "square", color: "#0D102855" },
-                { value: "PM (solid)", type: "square", color: "#0D1028" },
-              ]}
-            />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
             <Bar dataKey="am" name="AM" fillOpacity={0.45}>
               {data.map((w) => (
                 <Cell key={`am-${w.id}`} fill={TIER_COLOR[w.tier]} />
@@ -96,6 +90,10 @@ export default function EvidenceChart() {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      <p className="mt-2 text-[10px] uppercase tracking-wide text-charcoal/40">
+        Lighter bar = AM · solid bar = PM · color = evidence tier
+      </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {WAYPOINT_EVIDENCE.map((w) => (
