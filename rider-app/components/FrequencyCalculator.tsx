@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FARES } from "@/lib/product-config";
 import { bandForHour, expectedWaitMinutes } from "@/lib/frequency";
+import StatGrid from "@/components/StatGrid";
 
 function formatHour(hour: number): string {
   const h = hour % 12 === 0 ? 12 : hour % 12;
@@ -48,37 +49,22 @@ export default function FrequencyCalculator({ flash = false }: { flash?: boolean
         <span>11 PM</span>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-            Departing
-          </p>
-          <p className="mt-1 font-display text-2xl font-semibold text-navy">
-            {formatHour(hour)}
-          </p>
-          <p className="text-xs text-charcoal/50">{band.label}</p>
-        </div>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-            Expected wait
-          </p>
-          <p className="mt-1 font-display text-2xl font-semibold text-burgundy">
-            ~{wait} min
-          </p>
-          <p className="text-xs text-charcoal/50">
-            every {band.headwayMinutes} min
-          </p>
-        </div>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-            Fare — fixed
-          </p>
-          <p className="mt-1 font-display text-2xl font-semibold text-navy">
-            ${FARES.singleRide.price.toFixed(2)}
-          </p>
-          <p className="text-xs text-charcoal/50">same at every hour</p>
-        </div>
-      </div>
+      <StatGrid
+        stats={[
+          { label: "Departing", value: formatHour(hour), caption: band.label },
+          {
+            label: "Expected wait",
+            value: `~${wait} min`,
+            caption: `every ${band.headwayMinutes} min`,
+            emphasis: "burgundy",
+          },
+          {
+            label: "Fare — fixed",
+            value: `$${FARES.singleRide.price.toFixed(2)}`,
+            caption: "same at every hour",
+          },
+        ]}
+      />
     </div>
   );
 }

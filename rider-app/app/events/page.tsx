@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BENCHMARKS, FARES } from "@/lib/product-config";
+import StatGrid from "@/components/StatGrid";
 
 async function startCheckout() {
   const res = await fetch("/api/checkout", {
@@ -54,32 +55,17 @@ export default function EventsPage() {
           />
         </label>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              Shuttle total
-            </p>
-            <p className="mt-1 font-display text-2xl font-semibold text-navy">
-              ${shuttleCost.toFixed(2)}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              Subway total
-            </p>
-            <p className="mt-1 font-display text-2xl font-semibold text-navy">
-              ${alternativeCost.toFixed(2)}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              {difference >= 0 ? "You save" : "Shuttle costs more"}
-            </p>
-            <p className="mt-1 font-display text-2xl font-semibold text-burgundy">
-              ${Math.abs(difference).toFixed(2)}
-            </p>
-          </div>
-        </div>
+        <StatGrid
+          stats={[
+            { label: "Shuttle total", value: `$${shuttleCost.toFixed(2)}` },
+            { label: "Subway total", value: `$${alternativeCost.toFixed(2)}` },
+            {
+              label: difference >= 0 ? "You save" : "Shuttle costs more",
+              value: `$${Math.abs(difference).toFixed(2)}`,
+              emphasis: "burgundy",
+            },
+          ]}
+        />
       </div>
 
       <div className="mt-6 max-w-sm rounded-sm border border-gold/50 bg-cream p-6">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BENCHMARKS, FARES } from "@/lib/product-config";
 import { supabase } from "@/lib/supabase";
+import StatGrid from "@/components/StatGrid";
 
 export default function EmployersPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -48,37 +49,26 @@ export default function EmployersPage() {
           />
         </label>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              Shuttle estimate (midpoint)
-            </p>
-            <p className="mt-1 font-display text-2xl font-semibold text-navy">
-              ${estimatedEmployerCost.toFixed(0)}
-            </p>
-            <p className="text-xs text-charcoal/50">per month for the group</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              Unlimited MetroCard
-            </p>
-            <p className="mt-1 font-display text-2xl font-semibold text-navy">
-              ${metroCardCost.toFixed(0)}
-            </p>
-            <p className="text-xs text-charcoal/50">per month for the group</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              Monthly difference
-            </p>
-            <p className="mt-1 font-display text-2xl font-semibold text-burgundy">
-              ${Math.abs(monthlyDifference).toFixed(0)} {monthlyDifference >= 0 ? "less" : "more"}
-            </p>
-            <p className="text-xs text-charcoal/50">
-              than the MetroCard comparison
-            </p>
-          </div>
-        </div>
+        <StatGrid
+          stats={[
+            {
+              label: "Shuttle estimate (midpoint)",
+              value: `$${estimatedEmployerCost.toFixed(0)}`,
+              caption: "per month for the group",
+            },
+            {
+              label: "Unlimited MetroCard",
+              value: `$${metroCardCost.toFixed(0)}`,
+              caption: "per month for the group",
+            },
+            {
+              label: "Monthly difference",
+              value: `$${Math.abs(monthlyDifference).toFixed(0)} ${monthlyDifference >= 0 ? "less" : "more"}`,
+              caption: "than the MetroCard comparison",
+              emphasis: "burgundy",
+            },
+          ]}
+        />
       </section>
 
       <div className="mt-6 max-w-md rounded-sm border border-beige bg-cream p-6">
