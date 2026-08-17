@@ -1,6 +1,8 @@
 "use client";
 
-import { FARES } from "@/lib/product-config";
+import { useState } from "react";
+import { BENCHMARKS, FARES } from "@/lib/product-config";
+import StatGrid from "@/components/StatGrid";
 
 async function startCheckout() {
   const res = await fetch("/api/checkout", {
@@ -13,6 +15,11 @@ async function startCheckout() {
 }
 
 export default function EventsPage() {
+  const [groupSize, setGroupSize] = useState(2);
+  const shuttleCost = groupSize * FARES.eventBundle.price;
+  const alternativeCost = groupSize * BENCHMARKS.subwayFare * 2;
+  const difference = alternativeCost - shuttleCost;
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
       <p className="text-[10px] font-semibold uppercase tracking-widest text-gold">
@@ -26,7 +33,42 @@ export default function EventsPage() {
         roughly double any other stop. Skip the post-event subway crush.
       </p>
 
-      <div className="mt-10 max-w-sm rounded-sm border border-gold/50 bg-cream p-6">
+      <div className="mt-10 max-w-sm rounded-sm border border-beige bg-cream p-6">
+        <h2 className="font-display text-xl font-semibold text-navy">
+          What does your group pay?
+        </h2>
+        <p className="mt-1 text-sm text-charcoal/60">
+          Compare the event round trip with a subway round trip.
+        </p>
+
+        <label className="mt-6 block text-sm text-charcoal/70">
+          Group size
+          <input
+            type="number"
+            min={1}
+            max={6}
+            value={groupSize}
+            onChange={(e) =>
+              setGroupSize(Math.min(6, Math.max(1, Number(e.target.value) || 1)))
+            }
+            className="mt-2 w-full rounded-sm border border-beige bg-cream px-3 py-2 text-charcoal"
+          />
+        </label>
+
+        <StatGrid
+          stats={[
+            { label: "Shuttle total", value: `$${shuttleCost.toFixed(2)}` },
+            { label: "Subway total", value: `$${alternativeCost.toFixed(2)}` },
+            {
+              label: difference >= 0 ? "You save" : "Shuttle costs more",
+              value: `$${Math.abs(difference).toFixed(2)}`,
+              emphasis: "burgundy",
+            },
+          ]}
+        />
+      </div>
+
+      <div className="mt-6 max-w-sm rounded-sm border border-gold/50 bg-cream p-6">
         <h2 className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
           Event round trip
         </h2>

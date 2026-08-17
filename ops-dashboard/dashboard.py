@@ -10,12 +10,14 @@ Requires traffic.duckdb in the same folder (copy it in, or point DB_PATH
 at wherever you keep the built database).
 """
 
+import os
+
 import altair as alt
 import duckdb
 import pandas as pd
 import streamlit as st
 
-DB_PATH = "traffic.duckdb"
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "traffic.duckdb")
 
 # Chart color roles, per the Visual & Chart Branding Guidelines doc:
 # burgundy = primary series, navy = secondary/comparison series,
@@ -39,6 +41,28 @@ def branded_line_chart(df: pd.DataFrame, x: str, y: str, title: str = ""):
             y=alt.Y(f"{y}:Q", title=None, axis=alt.Axis(gridColor=BRAND["beige"], labelColor=BRAND["charcoal"])),
         )
         .properties(title=title, background=BRAND["cream"])
+        .configure_view(strokeWidth=0)
+        .configure_title(color=BRAND["charcoal"], font="Inter", fontSize=13)
+    )
+
+
+# Comparison-view palette, in the order waypoints get assigned a color —
+# burgundy/navy/gold are the brand's primary/secondary/tertiary series colors.
+COMPARISON_COLORS = [BRAND["burgundy"], BRAND["navy"], BRAND["gold"], "#3A6B5E", "#8A4B6B", "#6B5B3A"]
+
+
+def branded_comparison_chart(df: pd.DataFrame, waypoints: list[str]):
+    color_scale = alt.Scale(domain=waypoints, range=COMPARISON_COLORS[: len(waypoints)])
+    return (
+        alt.Chart(df)
+        .mark_line(strokeWidth=2.5)
+        .encode(
+            x=alt.X("HH:Q", title="Hour", axis=alt.Axis(gridColor=BRAND["beige"], labelColor=BRAND["charcoal"])),
+            y=alt.Y("avg_vol:Q", title="Avg volume", axis=alt.Axis(gridColor=BRAND["beige"], labelColor=BRAND["charcoal"])),
+            color=alt.Color("Waypoint:N", scale=color_scale, legend=alt.Legend(title=None, labelColor=BRAND["charcoal"])),
+            tooltip=["Waypoint", "HH", "avg_vol"],
+        )
+        .properties(background=BRAND["cream"])
         .configure_view(strokeWidth=0)
         .configure_title(color=BRAND["charcoal"], font="Inter", fontSize=13)
     )
@@ -123,6 +147,30 @@ with col2:
         "PM rush total (4–7pm)",
         f"{int(rush['pm_vol']):,}",
         delta=f"{(rush['pm_vol'] / max(rush['am_vol'], 1) - 1) * 100:.0f}% vs AM",
+    )
+
+st.divider()
+st.subheader("Compare waypoints")
+st.caption("Select two or more waypoints to overlay their hourly profiles on one chart.")
+
+compare_selection = st.multiselect(
+    "Waypoints to compare",
+    list(WAYPOINTS.keys()),
+    default=list(WAYPOINTS.keys())[:2],
+)
+
+if len(compare_selection) < 2:
+    st.info("Pick at least 2 waypoints to see the overlay.")
+else:
+    compare_frames = []
+    for name in compare_selection:
+        wdf = hourly_profile(con, WAYPOINTS[name]["segments"]).copy()
+        wdf["Waypoint"] = name
+        compare_frames.append(wdf)
+    compare_df = pd.concat(compare_frames, ignore_index=True)
+    st.altair_chart(
+        branded_comparison_chart(compare_df, compare_selection),
+        use_container_width=True,
     )
 
 st.divider()

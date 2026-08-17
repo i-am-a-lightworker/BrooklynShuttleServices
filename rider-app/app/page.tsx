@@ -1,5 +1,6 @@
-import { ROUTE, FARES, BENCHMARKS, DEMAND_PROFILE, BRAND_NAME } from "@/lib/product-config";
-import ShuttleMap from "@/components/ShuttleMap";
+import { FARES, BENCHMARKS, BRAND_NAME } from "@/lib/product-config";
+import RouteAndMap from "@/components/RouteAndMap";
+import EvidenceChart from "@/components/EvidenceChart";
 
 export default function HomePage() {
   return (
@@ -31,49 +32,29 @@ export default function HomePage() {
         </a>
       </div>
 
-      <section className="mt-16 grid gap-4 sm:grid-cols-3">
-        {ROUTE.shuttles.map((leg) => (
-          <div
-            key={leg.id}
-            className={`rounded-sm border p-5 ${
-              leg.id === "hub"
-                ? "border-gold/60 bg-cream"
-                : "border-beige bg-cream"
-            }`}
-          >
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
-              {leg.evidenceTier === "concurrent" && "Same-study evidence"}
-              {leg.evidenceTier === "bridge" && "Bridging evidence"}
-              {leg.evidenceTier === "directional" && "Directional evidence"}
-            </p>
-            <h2 className="mt-1 font-display text-xl font-semibold text-navy">
-              {leg.label}
-            </h2>
-            <p className="text-sm text-charcoal/70">
-              {leg.from} → {leg.to}
-            </p>
-            <p className="mt-2 text-xs text-charcoal/50">{leg.note}</p>
-          </div>
-        ))}
-      </section>
+      <RouteAndMap />
 
-      <section className="mt-16">
-        <h2 className="mb-3 font-display text-2xl font-semibold text-navy">
-          Live tracking
-        </h2>
-        <ShuttleMap />
-      </section>
-
-      <section className="mt-16 rounded-sm border-l-2 border-burgundy bg-cream py-6 pl-8">
+      <section className="mt-16 rounded-sm border-l-2 border-burgundy bg-cream p-6 pl-8">
         <h2 className="font-display text-2xl font-semibold text-navy">
           Why the schedule leans PM
         </h2>
         <p className="mt-2 max-w-2xl text-charcoal/70">
-          PM rush ({DEMAND_PROFILE.pmRushWindow}) runs{" "}
-          {DEMAND_PROFILE.pmOverAmRange} at every waypoint we measured.
-          Shuttles run more frequently through the{" "}
-          {DEMAND_PROFILE.peakPlateauWindow} plateau — the fare stays the
-          same, the wait gets shorter.
+          Shuttles run more frequently through the PM plateau — the fare
+          stays the same, the wait gets shorter. Every bar below is a real
+          count, color-coded by how directly comparable it is to the
+          others — click a waypoint to see the raw numbers.
+        </p>
+        <div className="mt-6">
+          <EvidenceChart />
+        </div>
+        <p className="mt-6 max-w-2xl text-xs text-charcoal/50">
+          Built on NYC DOT Automated Traffic Volume Counts — a rotating
+          survey, not continuous monitoring. Each point above is labeled by
+          how directly comparable it is to the others.{" "}
+          <a href="#methodology" className="underline hover:text-burgundy">
+            Read the methodology note
+          </a>
+          .
         </p>
       </section>
 
@@ -96,6 +77,27 @@ export default function HomePage() {
           </span>{" "}
           dollar van
         </div>
+      </section>
+
+      <section
+        id="methodology"
+        className="mt-16 scroll-mt-8 border-t border-beige pt-8 text-xs text-charcoal/60"
+      >
+        <h2 className="text-[10px] font-semibold uppercase tracking-wide text-charcoal/50">
+          Methodology note
+        </h2>
+        <p className="mt-2 max-w-2xl">
+          Built on NYC DOT Automated Traffic Volume Counts — a rotating
+          survey, not continuous monitoring. Segments get counted for a
+          window, then the survey moves on, so no two waypoints above were
+          necessarily measured at the same time. That&apos;s why every point
+          is tagged by evidence tier: concurrent points came from the same
+          field study, bridge points are a different study but corridor-
+          adjacent, directional points are different years and are used for
+          direction/shape rather than exact magnitude, and the one anomaly
+          point is shown because it doesn&apos;t fit the pattern — not
+          because it does.
+        </p>
       </section>
     </div>
   );
