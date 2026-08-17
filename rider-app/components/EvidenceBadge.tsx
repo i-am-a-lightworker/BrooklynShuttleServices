@@ -3,14 +3,16 @@ import { pmOverAmPct } from "@/lib/evidence-data";
 import Disclosure from "@/components/Disclosure";
 
 // These Tailwind classes intentionally match EVIDENCE_TIER_COLOR in lib/brand.ts; update both together.
+// concurrent/bridge text colors reuse the brand's navy/burgundy tokens directly,
+// since those are literally the PM hex for those two tiers in the chart.
 const TIER_STYLES: Record<
   WaypointEvidence["tier"],
   { bg: string; text: string; label: string }
 > = {
-  concurrent: { bg: "bg-green-100", text: "text-green-800", label: "Concurrent" },
-  bridge: { bg: "bg-amber-100", text: "text-amber-800", label: "Bridge" },
+  concurrent: { bg: "bg-sky-100", text: "text-navy", label: "Concurrent" },
+  bridge: { bg: "bg-pink-100", text: "text-burgundy", label: "Bridge" },
   directional: { bg: "bg-gray-200", text: "text-gray-700", label: "Directional" },
-  anomaly: { bg: "bg-rose-100", text: "text-rose-800", label: "Anomaly" },
+  anomaly: { bg: "bg-charcoal", text: "text-cream", label: "Anomaly" },
 };
 
 export default function EvidenceBadge({

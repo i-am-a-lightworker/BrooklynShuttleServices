@@ -19,7 +19,7 @@ import {
 import { BRAND, EVIDENCE_TIER_COLOR } from "@/lib/brand";
 import EvidenceBadge from "./EvidenceBadge";
 
-const TIER_COLOR: Record<WaypointEvidence["tier"], string> = EVIDENCE_TIER_COLOR;
+const TIER_COLOR = EVIDENCE_TIER_COLOR;
 
 function shortLabel(label: string): string {
   return label.length > 16 ? label.slice(0, 15) + "…" : label;
@@ -73,14 +73,19 @@ export default function EvidenceChart() {
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="am" name="AM" fillOpacity={0.45}>
+            <Bar dataKey="am" name="AM">
               {data.map((w) => (
-                <Cell key={`am-${w.id}`} fill={TIER_COLOR[w.tier]} />
+                <Cell
+                  key={`am-${w.id}`}
+                  fill={TIER_COLOR[w.tier].am}
+                  stroke={BRAND.beige}
+                  strokeWidth={1}
+                />
               ))}
             </Bar>
             <Bar dataKey="pm" name="PM">
               {data.map((w) => (
-                <Cell key={`pm-${w.id}`} fill={TIER_COLOR[w.tier]} />
+                <Cell key={`pm-${w.id}`} fill={TIER_COLOR[w.tier].pm} />
               ))}
             </Bar>
           </BarChart>
@@ -88,7 +93,7 @@ export default function EvidenceChart() {
       </div>
 
       <p className="mt-2 text-[10px] uppercase tracking-wide text-charcoal/40">
-        Lighter bar = AM · solid bar = PM · color = evidence tier
+        Lighter shade = AM · darker shade = PM · color pair = evidence tier
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">

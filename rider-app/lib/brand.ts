@@ -14,9 +14,15 @@ export const BRAND = {
 // EvidenceTier so adding/renaming a tier is a compile error here (and, since
 // EvidenceBadge.tsx's TIER_STYLES is separately typed the same way, there
 // too) rather than a silently-missed color.
-export const EVIDENCE_TIER_COLOR: Record<EvidenceTier, string> = {
-  concurrent: "#16a34a",
-  bridge: "#d97706",
-  directional: "#6b7280",
-  anomaly: "#e11d48",
+//
+// Each tier gets a light (AM) / dark (PM) pair rather than one hue at two
+// opacities — concurrent and bridge deliberately reuse BRAND.navy/burgundy
+// so the chart ties back to the site's actual identity colors. Anomaly is
+// pure black/white on purpose: it's the one tier that doesn't fit the
+// pattern, and the chart says so visually too.
+export const EVIDENCE_TIER_COLOR: Record<EvidenceTier, { am: string; pm: string }> = {
+  concurrent: { am: "#7DD3FC", pm: BRAND.navy }, // light blue / navy
+  bridge: { am: "#F9A8D4", pm: BRAND.burgundy }, // pink / maroon
+  directional: { am: "#D1D5DB", pm: "#6B7280" }, // unchanged gray family
+  anomaly: { am: "#FFFFFF", pm: "#000000" }, // black & white
 };
