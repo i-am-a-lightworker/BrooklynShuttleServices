@@ -246,6 +246,12 @@ export default function ShuttleMap({ hoveredSegment = null }: ShuttleMapProps) {
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     if (!token || !mapContainer.current) return;
     mapboxgl.accessToken = token;
+    // Reset on every effect run, not just at initial useRef() — React's
+    // dev-mode double-invoke (mount -> cleanup -> mount) reuses this same
+    // ref across the cycle, so without resetting here the cleanup from the
+    // first (synthetic) mount permanently marks the real mount as unmounted
+    // before its async work even starts.
+    isMountedRef.current = true;
 
     const map = new mapboxgl.Map({
       container: mapContainer.current,
